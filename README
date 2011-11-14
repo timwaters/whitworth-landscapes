@@ -1,0 +1,14 @@
+http://whitworth.geothings.net/
+
+Historical landscape paintings, mapped with flickr photos of landscape around the same area.
+
+It uses clever internet wizardry (Yahoo's Placemaker) to parse out the locations from the titles of the paintings, and then put them on a map with the correct image. Improvements: Allow people to correct location of the scene. Written during Cuture Hack North 2011, Leeds, UK
+
+Made by Tim Waters
+
+Dev notes:
+
+you need a Flickr API Key and a Yahoo App API Key
+
+You'd need the painting images to use, put these in /public/images
+
