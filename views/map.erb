@@ -1,0 +1,86 @@
+<html><head><title>Whitworth Landscape Paintings  - Tim Waters - Culture Hack North</title>
+
+    <!-- Leaflet CSS -->
+    <style>
+      .my_img {
+        max-width: 400px !important;
+        /* Resize the image for IE6 */
+        width: expression(this.width >400 ? 400: true);
+      }</style>
+    <link rel="stylesheet" href="http://geothings.net/geoiq/CloudMade-Leaflet-404b097/dist/leaflet.css" />
+    <!--[if lte IE 8]><link rel="stylesheet" href="http://geothings.net/geoiq/CloudMade-Leaflet-404b097/dist/leaflet.ie.css"" /><![endif]-->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" type="text/javascript"></script>
+    <!-- Leaflet JavaScript -->
+    <script src="http://geothings.net/geoiq/CloudMade-Leaflet-404b097/dist/leaflet.js"></script>
+    <script type="text/javascript">
+      function init(){
+        // Leaflet map
+        var myMap = new L.Map('map');
+
+        // set up acetate tile layer
+        var acetateUrl =  'http://{s}.acetate.geoiq.com/tiles/acetate/{z}/{x}/{y}.png';
+        var acetateAttrib = '2011 GeoIQ & Stamen, Data from OSM and Natural Earth';
+        var acetate = new L.TileLayer(acetateUrl, {maxZoom: 18, attribution: acetateAttrib, subdomains: ['a1', 'a2', 'a3']});
+        var leeds = new L.LatLng(53.796, -1.551);
+        // set view to leeds, and add layer. method chaining, yumm.
+        myMap.setView(leeds, 6).addLayer(acetate);
+	
+        // Add empty geojson layer
+        var geojsonLayer = new L.GeoJSON();
+        geojsonLayer.on("featureparse", function (e) {
+          if (e.properties && e.properties.name){
+            html = "<b>"+e.properties.name +"</b> <br />"+	e.properties.creator ;
+            if (e.properties.ref) {
+              html = html +" <div width='400px' ><img srs='1px.gif' width='400px' height='1px' /><img class='my_img' src='images/"+e.properties.ref +"'  /><br /> <a target='_new' href='pics/"+e.properties.lat+"/"+e.properties.lon+"'>Flickr landscapes</a></div>"
+            }
+            e.layer.bindPopup(html, {'maxWidth':500, 'autoPan': true});
+          }
+        });
+
+
+        var geojsonFeature;
+    <% @paintings.each do | painting | %>
+          geojsonFeature = {
+            "type": "Feature",
+            "properties": {
+              "name": "<%= painting.TitMainTitle %>",
+              "creator": "<%= painting.Creator %>",
+              "ref" : "<%= painting.imagefilename %>",
+              "lat": "<%= painting.lat %>",
+              "lon" : "<%= painting.lon %>"
+            },
+            "geometry": {
+              "type": "Point",
+              "coordinates": [<%= painting.lon + (rand / 50) %>, <%= painting.lat + (rand / 50 ) %>]
+            }
+          };
+          geojsonLayer.addGeoJSON(geojsonFeature);
+    <% end %>
+
+        myMap.addLayer(geojsonLayer);
+
+      }
+    </script>
+
+  </head>
+  <body onload="init();">
+    <h3 style='margin-bottom: 0px;'>Culture Hack North - Whitworth Art Gallery Landscape Paintings & Flickr Photos.</h3>
+    <div id="map" style="height: 79%;"></div>
+    <div id="photos"  style='display:none; float: right; position: absolute; top: 31px;right: 0px;z-index:1000' >
+      <a href="javascript:jQuery('#photosin').toggle();">Flickr Photos</a>
+      <div id="photosin" style='display:none'>
+        <img src = 'http://farm3.static.flickr.com/2318/2444917327_6e7eda2ee1_z.jpg' class='my_img'/> <br /> <img src = 'http://farm3.static.flickr.com/2670/3867951176_8967273b69_z.jpg' class='my_img'/> <br /> <img src = 'http://farm4.static.flickr.com/3509/3867953718_8644be225a_z.jpg' class='my_img'/> <br />
+      </div>
+
+    </div>
+    <div id="info" style="font-size:smaller">
+      <b>What this does:</b>Historical landscape paintings, mapped with flickr photos of landscape around the same area.<br /> It uses clever internet wizardry (Yahoo's Placemaker) to parse out the locations from the titles of the paintings, and then put them on a map with the correct image. Improvements:  Allow people to correct location of the scene. Written during <a href="http://culturehacknorth.co.uk/">Cuture Hack North 2011, Leeds, UK</a><br />
+      Made by Tim Waters - <b>@tim_waters</b>
+    </div>
+    <script type="text/javascript">
+
+    </script>
+
+  </body>
+</html>
+
